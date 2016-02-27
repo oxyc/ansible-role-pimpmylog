@@ -13,6 +13,24 @@
     mode: 0777
   when: pimpmylog_grant_all_privs
 
+- name: Copy custom software config into place.
+  template:
+    src: softwares.inc.user.php.j2
+    dest: "{{ pimpmylog_install_dir }}/cfg/softwares.inc.user.php"
+    owner: root
+    group: root
+    mode: 0644
+  when: pimpmylog_enable_mysql_software
+
+- name: Copy mysql software config into place.
+  template:
+    src: mysql.config.user.php.j2
+    dest: "{{ pimpmylog_install_dir }}/cfg/mysql.config.user.php"
+    owner: root
+    group: root
+    mode: 0644
+  when: pimpmylog_enable_mysql_software
+
 - name: Copy custom paths configs in place.
   template:
     src: custom.paths.user.php.j2
@@ -21,4 +39,4 @@
     group: root
     mode: 0644
   with_items: pimpmylog_extra_paths
-  when: pimpmylog_extra_paths | length
+  when: pimpmylog_extra_paths | default([]) | length

@@ -4,6 +4,8 @@ pimpmylog_repo: https://github.com/potsky/PimpMyLog.git
 pimpmylog_version: master
 pimpmylog_grant_all_privs: no
 
+pimpmylog_enable_mysql_software: yes
+
 pimpmylog_extra_paths:
   - software: apache
     access_files:
@@ -11,3 +13,16 @@ pimpmylog_extra_paths:
       - other_vhosts_access_log
     error_files: []
     directories: []
+
+  - software: mysql
+    access_files:
+      - mysql-slow.log
+      - mysql_slow.log
+    error_files:
+      - mysql.err
+      - mysqld.err
+      - mariadb.err
+    directories:
+      - /var/log/mysql/
+      - /var/log/mariadb/
+      - /var/log/

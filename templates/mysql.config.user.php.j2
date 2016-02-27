@@ -1,0 +1,79 @@
+<?php
+
+function mysql_load_software() {
+	return array(
+		'name'    => __('MySQL'),
+		'desc' => __("The world's most popular open source database"),
+		'home' => __('https://www.mysql.com/'),
+		'notes' => __('Default log formats are supported'),
+	);
+}
+
+
+function mysql_get_config( $type , $file , $software , $counter ) {
+
+	$file_json_encoded = json_encode( $file );
+
+	// Only error log supported for now.
+	if ( $type == 'error' ) {
+
+		return<<<EOF
+		"$software$counter": {
+			"display": "MYSQL Error #$counter",
+			"path": $file_json_encoded,
+			"format": {
+				"type": "MYSQL",
+				"export_title": "Error",
+				"multiline": "Log",
+				"regex": "|^(.{2})(.{2})(.{2}) (.*):(.*):(.*) (.*) (.*)$|U",
+				"match": {
+						"Date": [1, "-", 2, "-", 3, " ", 4, ":", 5, ":", 6 ],
+						"Engine": 7,
+						"Log": 8
+				},
+				"types"    : {
+						"Date"   : "date:d\/m\/Y H:i:s \/100",
+						"Engine" : "txt",
+						"Log"    : "preformatted"
+				}
+			}
+		}
+EOF;
+
+	}
+
+	else if ( $type == 'access' ) {
+
+		return<<<EOF
+		"$software$counter": {
+			"display": "MySQL Slow Query #$counter",
+			"path": $file_json_encoded,
+      "refresh" : 5,
+      "max"     : 10,
+      "notify"  : true,
+			"format": {
+				"type": "MySQL",
+				"export_title": "Slow Query",
+				"multiline": "Query",
+				"regex": "|^(.{2})(.{2})(.{2}) (.*):(.*):(.*) (.*) (.*)$|U",
+				"regex": "|^# Query_time:\\\s+(.*)\\\s+Lock_time:\\\s+(.*)\\\s+Rows_sent:\\\s+(.*)\\\s+Rows_examined:\\\s+([0-9]+)$|U",
+        "match": {
+            "QueryTime": 1,
+            "LockTime": 2,
+            "RowsSent": 3,
+            "RowsExamined": 4,
+            "Query": 5
+        },
+        "types"    : {
+            "QueryTime": "numeral",
+            "LockTime": "numeral",
+            "RowsSent": "numeral",
+            "RowsExamined": "numeral",
+            "Query": "preformatted"
+        }
+			}
+		}
+EOF;
+
+	}
+}
